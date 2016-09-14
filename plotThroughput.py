@@ -113,8 +113,8 @@ for file in files:
     else:
       plt.title('Throughput During File Transfer On ' + ifaces[index])
 
-    saveLocation = 'plots/' + date + '-graph-' + ifaces[index] + '.pdf'
-    saveLocation2 = "png/" + date + '-graph-' + ifaces[index] + '.png'
+    saveLocation = 'plots/' + file.split("-")[0] + '-' + ifaces[index] + '-' + date + '.pdf'
+    saveLocation2 = "png/" + file.split("-")[0] + '-' + ifaces[index] + '-' + date + '.png'
     plt.savefig(saveLocation, bbox_inches='tight')
     plt.savefig(saveLocation2, bbox_inches='tight')
     #plt.show()
