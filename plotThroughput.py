@@ -51,35 +51,48 @@ for file in files:
   avgPacketsIn = [[] for _ in xrange(len(ifaces))]
   # Average the data over 10 samples
   skip = 0
-  for i in range(len(dataPoints) - 10 * len(ifaces)):
+  for i in range(len(dataPoints) - (10 * len(ifaces))):
     if skip:
       skip -= 1
       continue
-    for j in range(11 * len(ifaces)):
+    #print range(10 * len(ifaces))
+    for j in range(10 * len(ifaces)):
       if timestamp[i] != timestamp[i+j]:
+        #print "mismatch!: " + str(timestamp[i]) + " and " + str(timestamp[i+j])
+        j -= 1
         break
+    #print "matching: " + str(timestamp[i]) + " and " + str(timestamp[i+j])
     sumMbitOut = [[] for _ in xrange(len(ifaces))]
     sumMbitIn = [[] for _ in xrange(len(ifaces))]
     sumPacketsOut = [[] for _ in xrange(len(ifaces))]
     sumPacketsIn = [[] for _ in xrange(len(ifaces))]
-    for k in range(j):
+    for k in range(j + 1):
+      #print (i+k+1)
       whichIface = k % len(ifaces)
       sumMbitOut[whichIface].append(MbitOut[i+k])
       sumMbitIn[whichIface].append(MbitIn[i+k])
       sumPacketsOut[whichIface].append(packetsOut[i+k])
       sumPacketsIn[whichIface].append(packetsIn[i+k])
+    #print sumMbitOut
+    #print sumMbitIn
+    #print sumPacketsOut
+    #print sumPacketsIn
     for m in range(len(ifaces)):
-      avgTimestamp[m].append(timestamp[i])
-      avgMbitOut[m].append(sum(sumMbitOut[m]) / len(sumMbitOut[m]))
-      avgMbitIn[m].append(sum(sumMbitIn[m]) / len(sumMbitIn[m]))
-      avgPacketsOut[m].append(sum(sumPacketsOut[m]) / len(sumPacketsOut[m]))
-      avgPacketsIn[m].append(sum(sumPacketsIn[m]) / len(sumPacketsIn[m]))
-    skip = j - 1
+      if (len(sumMbitOut[m]) > 0):
+        avgTimestamp[m].append(timestamp[i])
+        avgMbitOut[m].append(sum(sumMbitOut[m]) / len(sumMbitOut[m]))
+        avgMbitIn[m].append(sum(sumMbitIn[m]) / len(sumMbitIn[m]))
+        avgPacketsOut[m].append(sum(sumPacketsOut[m]) / len(sumPacketsOut[m]))
+        avgPacketsIn[m].append(sum(sumPacketsIn[m]) / len(sumPacketsIn[m]))
+      #else:
+      #  print "No data!"
+    #print "done!"
+    skip = j
 
   for index in range(len(ifaces)):
-    print "Mbps In for " + ifaces[index] + ":"
-    print len(MbitIn[index::4])
-    print " "
+    #print "Mbps In for " + ifaces[index] + ":"
+    #print avgMbitIn[index]
+    #print " "
     plt.figure(num=None, figsize=(16, 12), dpi=90, facecolor='w', edgecolor='k')
 
     ax = plt.subplot(111)
@@ -88,11 +101,9 @@ for file in files:
     #graphPacketsOut = ax.scatter(range(len(dataPoints) / len(ifaces)), packetsOut[index::len(ifaces)], s=20, c='g', alpha=0.8, lw=0, label='Packets Out Per Second')
     #graphPacketsIn = ax.scatter(range(len(dataPoints) / len(ifaces)), packetsIn[index::len(ifaces)], s=20, c='m', alpha=0.8, lw=0, label='Packets In Per Second')
 
-    #ax.legend(handles=[graphMbitOut, graphMbitIn, graphPacketsOut, graphPacketsIn], loc=2)
     ax.legend(handles=[graphMbitOut, graphMbitIn], loc=2)
 
     plt.xlim([-20, len(avgTimestamp[index]) + 20])
-    #plt.ylim([-5, max(max(MbitOut[index::len(ifaces)]), max(MbitIn[index::len(ifaces)]), max(packetsOut[index::len(ifaces)]), max(packetsIn[index::len(ifaces)])) + 20])
     plt.ylim([-5, max(max(avgMbitOut[index]), max(avgMbitIn[index])) + 20])
 
     plt.xlabel('Time (s)')
