@@ -20,6 +20,7 @@ for file in files:
     dataPoints = []
     timestamp = []
     interfaceField = []
+    interfaceActivity = [[],[]]
     MbitOut = []
     MbitIn = []
     packetsOut = []
@@ -28,8 +29,9 @@ for file in files:
     errorsOut = []
     ifaces = []
     for line in data:
-      if "timestamp" in line or line[0] == '#':
-        pass
+      if "timestamp" in line or "down" in line or "back" in line:
+        interfaceActivity[0].append(len(dataPoints))
+        interfaceActivity[1].append(line[1:].split('at')[0])
       else:
         dataPoints.append(line.split(";"))
     for i in range(len(dataPoints)):
@@ -55,28 +57,20 @@ for file in files:
     if skip:
       skip -= 1
       continue
-    #print range(10 * len(ifaces))
     for j in range(10 * len(ifaces)):
       if timestamp[i] != timestamp[i+j]:
-        #print "mismatch!: " + str(timestamp[i]) + " and " + str(timestamp[i+j])
         j -= 1
         break
-    #print "matching: " + str(timestamp[i]) + " and " + str(timestamp[i+j])
     sumMbitOut = [[] for _ in xrange(len(ifaces))]
     sumMbitIn = [[] for _ in xrange(len(ifaces))]
     sumPacketsOut = [[] for _ in xrange(len(ifaces))]
     sumPacketsIn = [[] for _ in xrange(len(ifaces))]
     for k in range(j + 1):
-      #print (i+k+1)
       whichIface = k % len(ifaces)
       sumMbitOut[whichIface].append(MbitOut[i+k])
       sumMbitIn[whichIface].append(MbitIn[i+k])
       sumPacketsOut[whichIface].append(packetsOut[i+k])
       sumPacketsIn[whichIface].append(packetsIn[i+k])
-    #print sumMbitOut
-    #print sumMbitIn
-    #print sumPacketsOut
-    #print sumPacketsIn
     for m in range(len(ifaces)):
       if (len(sumMbitOut[m]) > 0):
         avgTimestamp[m].append(timestamp[i])
@@ -84,27 +78,32 @@ for file in files:
         avgMbitIn[m].append(sum(sumMbitIn[m]) / len(sumMbitIn[m]))
         avgPacketsOut[m].append(sum(sumPacketsOut[m]) / len(sumPacketsOut[m]))
         avgPacketsIn[m].append(sum(sumPacketsIn[m]) / len(sumPacketsIn[m]))
-      #else:
-      #  print "No data!"
-    #print "done!"
     skip = j
 
+  for index in range(len(interfaceActivity[0])):
+    interfaceActivity[0][index] = (interfaceActivity[0][index] / (10 * len(ifaces)))
+
   for index in range(len(ifaces)):
-    #print "Mbps In for " + ifaces[index] + ":"
-    #print avgMbitIn[index]
-    #print " "
     plt.figure(num=None, figsize=(16, 12), dpi=90, facecolor='w', edgecolor='k')
 
     ax = plt.subplot(111)
     graphMbitOut = ax.scatter(range(len(avgTimestamp[index])), avgMbitOut[index], s=20, c='b', alpha=0.8, lw=0, label='Traffic Out')
     graphMbitIn = ax.scatter(range(len(avgTimestamp[index])), avgMbitIn[index], s=20, c='r', alpha=0.8, lw=0, label='Traffic In')
-    #graphPacketsOut = ax.scatter(range(len(dataPoints) / len(ifaces)), packetsOut[index::len(ifaces)], s=20, c='g', alpha=0.8, lw=0, label='Packets Out Per Second')
-    #graphPacketsIn = ax.scatter(range(len(dataPoints) / len(ifaces)), packetsIn[index::len(ifaces)], s=20, c='m', alpha=0.8, lw=0, label='Packets In Per Second')
 
     ax.legend(handles=[graphMbitOut, graphMbitIn], loc=2)
 
+    
+    upperLimit = max(max(avgMbitOut[index]), max(avgMbitIn[index]))
+    upperLimit = 200
     plt.xlim([-20, len(avgTimestamp[index]) + 20])
-    plt.ylim([-5, max(max(avgMbitOut[index]), max(avgMbitIn[index])) + 20])
+    plt.ylim([-5, upperLimit + 20])
+
+    position = upperLimit / 3
+    for i in range(len(interfaceActivity[0])):
+      position += 10
+      #print interfaceActivity[0][i]
+      plt.axvline(interfaceActivity[0][i])
+      ax.annotate(interfaceActivity[1][i], xy=(0, 0), xytext=((interfaceActivity[0][i] + 5), position))
 
     plt.xlabel('Time (s)')
     plt.ylabel('Throughput (Mbps)')

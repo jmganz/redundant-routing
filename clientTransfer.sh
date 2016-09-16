@@ -1,6 +1,5 @@
 #!/bin/csh
 
-#print `date +%m-%d-%y_%H:%M`
 cd /users/jonganz
 set logFile="client-throughput-`date +%m-%d-%y_%H:%M`.csv"
 bwm-ng -o csv -F $logFile -t 50 &
@@ -28,16 +27,3 @@ sleep 60
 echo "$interface back up at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
 sleep 70
 kill -2 $bwm
-
-
-
-#wget server &
-#wget=$!
-#echo $wget
-#sleep 10
-#while kill -0 $wget 2> /dev/null
-#do
-#  sleep 10
-#done
-#sleep 10
-#kill -2 $bwm
