@@ -6,6 +6,7 @@ set bwm=$!
 sleep 30
 
 cat $logFile | tail -20 | sed '/total/d' | sort -n -t';' -k 3 | tail -1 | awk -F';' '{print $2}' | tr -d " " > which.interface
+scp which.interface client:/users/jonganz/which.interface
 while !( -f dropConnection.now )
 end
 set interface=`cat dropConnection.now`
@@ -16,8 +17,9 @@ rm which.interface
 sleep 60
 sudo ifconfig $interface up
 echo "$interface back up at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
-sleep 20
+sleep 50
 cat $logFile | tail -20 | sed '/total/d' | sort -n -t';' -k 3 | tail -1 | awk -F';' '{print $2}' | tr -d " " > which.interface
+scp which.interface client:/users/jonganz/which.interface
 while !( -f dropConnection.now )
 end
 set interface=`cat dropConnection.now`
@@ -28,8 +30,9 @@ rm which.interface
 sleep 60
 sudo ifconfig $interface up
 echo "$interface back up at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
-sleep 20
+sleep 50
 cat $logFile | tail -20 | sed '/total/d' | sort -n -t';' -k 3 | tail -1 | awk -F';' '{print $2}' | tr -d " " > which.interface
+scp which.interface client:/users/jonganz/which.interface
 while !( -f dropConnection.now )
 end
 set interface=`cat dropConnection.now`

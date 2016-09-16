@@ -9,19 +9,19 @@ sleep 10
 iperf3 -c server -t 600 --logfile iperf3-client-log-`date +%m-%d-%y_%H:%M`.log &
 sleep 120
 set interface=`cat which.interface`
-cp which.interface dropConnection.now
+scp which.interface clientEdge:/users/jonganz/dropConnection.now
 echo "$interface down at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
 sleep 60
 echo "$interface back up at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
 sleep 120
 set interface=`cat which.interface`
-cp which.interface dropConnection.now
+scp which.interface clientEdge:/users/jonganz/dropConnection.now
 echo "$interface down at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
 sleep 60
 echo "$interface back up at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
 sleep 120
 set interface=`cat which.interface`
-cp which.interface dropConnection.now
+scp which.interface clientEdge:/users/jonganz/dropConnection.now
 echo "$interface down at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
 sleep 60
 echo "$interface back up at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
