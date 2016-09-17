@@ -1,29 +1,47 @@
 #!/bin/csh
 
-cd /users/jonganz
-set logFile="client-throughput-`date +%m-%d-%y_%H:%M`.csv"
-bwm-ng -o csv -F $logFile -t 50 &
-set bwm=$!
-sleep 10
+if !( -d /users/jonganz/logs ) then
+  mkdir /users/jonganz/logs
+endif
 
-iperf3 -c server -t 600 --logfile iperf3-client-log-`date +%m-%d-%y_%H:%M`.log &
-sleep 120
-set interface=`cat which.interface`
-scp which.interface clientEdge:/users/jonganz/dropConnection.now
-echo "$interface down at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
-sleep 60
-echo "$interface back up at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
-sleep 120
-set interface=`cat which.interface`
-scp which.interface clientEdge:/users/jonganz/dropConnection.now
-echo "$interface down at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
-sleep 60
-echo "$interface back up at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
-sleep 120
-set interface=`cat which.interface`
-scp which.interface clientEdge:/users/jonganz/dropConnection.now
-echo "$interface down at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
-sleep 60
-echo "$interface back up at `date +%m-%d-%y_%H:%M`" | tee -a $logFile
-sleep 70
+foreach interfaceFile ( which.interface.Edge which.interface.Client dropConnection.now )
+  if ( -f /users/jonganz/logs/$interfaceFile ) then
+    rm /users/jonganz/logs/$interfaceFile
+  endif
+end
+
+cd /users/jonganz
+set logFile="/users/jonganz/logs/client-throughput-`date +%m-%d-%y_%H:%M`.csv"
+echo "Experiment started at `date +%m-%d-%y_%T`"
+bwm-ng -o csv -F $logFile -t 100 &
+set bwm=$!
+sleep 20
+
+/usr/bin/iperf3 -c server -t 600 --logfile /users/jonganz/logs/iperf3-client-log-`date +%m-%d-%y_%H:%M`.log &
+sleep 110
+
+foreach i ( 1 2 3 )
+  sleep 5
+  while !( -f /users/jonganz/logs/which.interface.Client )
+  end
+  set interface=`cat /users/jonganz/logs/which.interface.Edge`
+  scp /users/jonganz/logs/which.interface.Client clientEdge:/users/jonganz/logs/dropConnection.now
+  echo "$interface down at `date +%m-%d-%y_%T`" | tee -a $logFile
+  if ( $i == 3 ) then
+    sleep 110
+  else
+    sleep 175
+  endif
+  echo "$interface back up at `date +%m-%d-%y_%T`" | tee -a $logFile
+end
+
+sleep 25
+
+foreach interfaceFile ( which.interface.Edge which.interface.Client dropConnection.now )
+  if ( -f /users/jonganz/logs/$interfaceFile ) then
+    rm /users/jonganz/logs/$interfaceFile
+  endif
+end
+
 kill -2 $bwm
+echo "Experiment completed at `date +%m-%d-%y_%T`"
