@@ -38,13 +38,13 @@ set link7 [$ns duplex-link $clientEdge $router3 200Mb 2.0ms DropTail]
 set link8 [$ns duplex-link $router1 $router2 1Gb 0ms DropTail]
 set link9 [$ns duplex-link $router2 $router3 1Gb 0ms DropTail]
 
-tb-set-node-startcmd $serverEdge "sudo /users/jonganz/router.sh > /users/jonganz/serverEdge.log 2>&1"
-tb-set-node-startcmd $clientEdge "sudo /users/jonganz/router.sh > /users/jonganz/clientEdge.log 2>&1"
-tb-set-node-startcmd $router1 "sudo /users/jonganz/router.sh > /users/jonganz/router1.log 2>&1"
-tb-set-node-startcmd $router2 "sudo /users/jonganz/router.sh > /users/jonganz/router2.log 2>&1"
-tb-set-node-startcmd $router3 "sudo /users/jonganz/router.sh > /users/jonganz/router3.log 2>&1"
-tb-set-node-startcmd $client "sudo /users/jonganz/client.sh > /users/jonganz/client.log 2>&1"
-tb-set-node-startcmd $server "sudo /users/jonganz/server.sh > /users/jonganz/server.log 2>&1"
+tb-set-node-startcmd $serverEdge "/users/jonganz/installScripts/router.sh >& /tmp/serverEdge.log"
+tb-set-node-startcmd $clientEdge "/users/jonganz/installScripts/router.sh >& /tmp/clientEdge.log"
+tb-set-node-startcmd $router1 "/users/jonganz/installScripts/router.sh >& /tmp/router1.log"
+tb-set-node-startcmd $router2 "/users/jonganz/installScripts/router.sh >& /tmp/router2.log"
+tb-set-node-startcmd $router3 "/users/jonganz/installScripts/router.sh >& /tmp/router3.log"
+tb-set-node-startcmd $client "/users/jonganz/installScripts/client.sh >& /tmp/client.log"
+tb-set-node-startcmd $server "/users/jonganz/installScripts/server.sh >& /tmp/server.log"
 
 # Use dynamic routing
 $ns rtproto "Session"

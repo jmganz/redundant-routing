@@ -4,13 +4,15 @@ if !( -d /users/jonganz/logs ) then
   mkdir /users/jonganz/logs
 endif
 
-foreach interfaceFile ( which.interface.Edge which.interface.Client dropConnection.now )
+foreach interfaceFile ( which.interface.Edge which.interface.Client dropConnection.now start.edge )
   if ( -f /users/jonganz/logs/$interfaceFile ) then
     rm /users/jonganz/logs/$interfaceFile
   endif
 end
 
 cd /users/jonganz
+while !( -f /users/jonganz/logs/start.edge )
+end
 set logFile="/users/jonganz/logs/clientEdge-throughput-`date +%m-%d-%y_%H:%M`.csv"
 echo "Experiment started at `date +%m-%d-%y_%T`"
 bwm-ng -o csv -F $logFile -t 100 &
@@ -18,7 +20,11 @@ set bwm=$!
 sleep 120
 
 foreach i ( 1 2 3 )
-  cat $logFile | tail -20 | sed '/total/d' | sort -n -t';' -k 3 | tail -1 | awk -F';' '{print $2}' | tr -d " " > /users/jonganz/logs/which.interface.Edge
+  set activeInterfaceLine=`cat $logFile | tail -300 | sed '/total/d' | sed '/lo/d' | sort -n -t';' -k 3 | tail -1`
+  set activeInterface=`echo $activeInterfaceLine | awk -F';' '{print $2}'`
+  set activeSpeed=`echo $activeInterfaceLine | awk -F';' '{print $3}'`
+  echo "found $activeInterface with speed $activeSpeed bytes/sec"
+  echo $activeInterface > /users/jonganz/logs/which.interface.Edge
   scp /users/jonganz/logs/which.interface.Edge client:/users/jonganz/logs/which.interface.Client
   while !( -f /users/jonganz/logs/dropConnection.now )
   end
@@ -31,7 +37,7 @@ foreach i ( 1 2 3 )
     sleep 175
   endif
 
-  foreach interfaceFile ( which.interface.Edge which.interface.Client dropConnection.now )
+  foreach interfaceFile ( which.interface.Edge which.interface.Client dropConnection.now start.edge )
     if ( -f /users/jonganz/logs/$interfaceFile ) then
       rm /users/jonganz/logs/$interfaceFile
     endif

@@ -16,6 +16,7 @@ files = sorted(glob.glob('*.csv'))
 
 for file in files:
   date = "-".join(file.split("-")[2:]).split(".")[0]
+  print file
   with open (file, "r") as data:
     dataPoints = []
     timestamp = []
@@ -35,6 +36,7 @@ for file in files:
       else:
         dataPoints.append(line.split(";"))
     for i in range(len(dataPoints)):
+      #print dataPoints[i]
       timestamp.append(dataPoints[i][0])
       interfaceField.append(dataPoints[i][1])
       MbitOut.append(float(dataPoints[i][2]) * 8.0 / 1000000.0)

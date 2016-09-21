@@ -11,6 +11,7 @@ foreach interfaceFile ( which.interface.Edge which.interface.Client dropConnecti
 end
 
 cd /users/jonganz
+scp /users/jonganz/logs/start.client clientEdge:/users/jonganz/logs/start.edge
 set logFile="/users/jonganz/logs/client-throughput-`date +%m-%d-%y_%H:%M`.csv"
 echo "Experiment started at `date +%m-%d-%y_%T`"
 bwm-ng -o csv -F $logFile -t 100 &
