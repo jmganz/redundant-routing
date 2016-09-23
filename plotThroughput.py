@@ -103,7 +103,6 @@ for file in files:
     ax.add_line(mlines.Line2D(range(len(avgTimestamp[index])), avgTraffic[index], color=color[index], label=ifaces[index]))
 
     avgTraffic[index].sort(reverse=True)
-    print avgTraffic[index][:10]
     for i in range(len(avgTraffic[index])):
       if avgTraffic[index][i] < 2 * avgTraffic[index][i+5]:
         goodMax = avgTraffic[index][i] # eliminate outliers
