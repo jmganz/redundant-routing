@@ -41,7 +41,7 @@ for file in files:
       interfaceField.append(dataPoints[i][1])
       MbitOut.append(float(dataPoints[i][2]) * 8.0 / 1000000.0)
       MbitIn.append(float(dataPoints[i][3]) * 8.0 / 1000000.0)
-      traffic.append(float((float(dataPoints[i][2])) * 8.0 / 1000000.0) + ((float(dataPoints[i][2])) * 8.0 / 1000000.0))
+      traffic.append(float((float(dataPoints[i][2])) * 8.0 / 1000000.0) + ((float(dataPoints[i][3])) * 8.0 / 1000000.0))
       packetsOut.append(float(dataPoints[i][7]))
       packetsIn.append(float(dataPoints[i][8]))
       errorsIn.append(int(dataPoints[i][14]))
