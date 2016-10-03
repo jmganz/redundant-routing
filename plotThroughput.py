@@ -14,9 +14,9 @@ import matplotlib.patches as mpatches
 # Collect the data from the given file
 
 files = sorted(glob.glob('*.csv'))
-#files = ['clientEdge-throughput-09-19-16_03:13.csv']
 
 for file in files:
+  #print file
   date = "-".join(file.split("-")[2:]).split(".")[0]
   with open (file, "r") as data:
     dataPoints = []
@@ -113,19 +113,23 @@ for file in files:
         avgPacketsIn[m].append(sum(sumPacketsIn[m]) / len(sumPacketsIn[m]))
     skip = j
 
-  color = ['b', 'r', 'g', 'm', 'k', 'c', 'y']
+  color = ['r', 'g', 'b', 'm', 'c', 'k', 'y']
 
   plt.figure(num=None, figsize=(16, 12), dpi=90, facecolor='w', edgecolor='k')
   ax = plt.subplot(111)
   graphTraffic = []
   upperLimit = -20
+  pixelSize = 20
+  transparency = 0.9
   for index in range(len(ifaces)):
     if ('total' == ifaces[index]) or ('lo' == ifaces[index]):
       continue
     #graphTraffic.append(mlines.Line2D(avgTimestamp[index], avgMbitOut[index], color=color[index], label=ifaces[index]))
     #ax.add_line(mlines.Line2D(avgTimestamp[index], avgMbitOut[index], color=color[index], label=ifaces[index]))
     #graphTraffic.append(ax.scatter(avgTimestamp[index], avgMbitOut[index], s=20, color=color[index], alpha=0.8, lw=0, label=ifaces[index]))
-    graphTraffic.append(ax.scatter(timestamp[index], MbitOut[index], s=20, color=color[index], alpha=0.8, lw=0, label=ifaces[index]))
+    graphTraffic.append(ax.scatter(timestamp[index], MbitOut[index], s=pixelSize, color=color[index], alpha=transparency, lw=0, label=ifaces[index]))
+    pixelSize -= 4
+    transparency -= 0.15
 
     avgMbitOut[index].sort(reverse=True)
     goodMax = 0
@@ -156,5 +160,6 @@ for file in files:
   saveLocation = 'plots/' + file.split("-")[0] + '-' + date + '.pdf'
   saveLocation2 = "png/" + file.split("-")[0] + '-' + date + '.png'
   plt.savefig(saveLocation, bbox_inches='tight')
-  plt.savefig(saveLocation2, bbox_inches='tight')
+  #print 'pdf done'
+  #plt.savefig(saveLocation2, bbox_inches='tight')
   plt.close()
