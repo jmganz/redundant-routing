@@ -159,7 +159,7 @@ for file in files:
 
   saveLocation = 'plots/' + file.split("-")[0] + '-' + date + '.pdf'
   saveLocation2 = "png/" + file.split("-")[0] + '-' + date + '.png'
-  plt.savefig(saveLocation, bbox_inches='tight')
+  #plt.savefig(saveLocation, bbox_inches='tight')
   #print 'pdf done'
-  #plt.savefig(saveLocation2, bbox_inches='tight')
+  plt.savefig(saveLocation2, bbox_inches='tight')
   plt.close()
