@@ -13,8 +13,8 @@ import matplotlib.patches as mpatches
 
 # Collect the data from the given file
 
-#files = sorted(glob.glob('*.csv'))
-files = ['clientEdge-throughput-09-19-16_03:13.csv']
+files = sorted(glob.glob('*.csv'))
+#files = ['clientEdge-throughput-09-19-16_03:13.csv']
 
 for file in files:
   date = "-".join(file.split("-")[2:]).split(".")[0]
@@ -25,7 +25,8 @@ for file in files:
     ifaces = []
     for line in data:
       if "timestamp" in line or "down" in line or "back" in line:
-        interfaceActivity[0].append(int(line[1:].split('at')[1]) - int(dataPoints[0][0]))
+        #interfaceActivity[0].append(int(line[1:].split('at')[1]) - int(dataPoints[0][0]))
+        interfaceActivity[0].append(int(line[1:].split('at')[1]))
         interfaceActivity[1].append(line[1:].split('at')[0])
       else:
         dataPoints.append(line.split(';'))
@@ -47,7 +48,8 @@ for file in files:
       adjustedIndex = index + drift
       whichInterface = adjustedIndex % len(ifaces)
       while (dataPoints[adjustedIndex][1] != ifaces[whichInterface]):
-        timestamp[whichInterface].append(dataPoints[i][0])
+        #print 'add ' + str(dataPoints[index][0])
+        timestamp[whichInterface].append(dataPoints[index][0])
         MbitOut[whichInterface].append(0)
         MbitIn[whichInterface].append(0)
         traffic[whichInterface].append(0)
@@ -120,8 +122,10 @@ for file in files:
   for index in range(len(ifaces)):
     if ('total' == ifaces[index]) or ('lo' == ifaces[index]):
       continue
-    graphTraffic.append(mlines.Line2D(range(len(avgTimestamp[index])), avgMbitOut[index], color=color[index], label=ifaces[index]))
-    ax.add_line(mlines.Line2D(range(len(avgTimestamp[index])), avgMbitOut[index], color=color[index], label=ifaces[index]))
+    #graphTraffic.append(mlines.Line2D(avgTimestamp[index], avgMbitOut[index], color=color[index], label=ifaces[index]))
+    #ax.add_line(mlines.Line2D(avgTimestamp[index], avgMbitOut[index], color=color[index], label=ifaces[index]))
+    #graphTraffic.append(ax.scatter(avgTimestamp[index], avgMbitOut[index], s=20, color=color[index], alpha=0.8, lw=0, label=ifaces[index]))
+    graphTraffic.append(ax.scatter(timestamp[index], MbitOut[index], s=20, color=color[index], alpha=0.8, lw=0, label=ifaces[index]))
 
     avgMbitOut[index].sort(reverse=True)
     goodMax = 0
@@ -132,15 +136,19 @@ for file in files:
     if upperLimit < goodMax:
       upperLimit = goodMax
   plt.legend(handles=graphTraffic, loc=2)
-
-  plt.xlim([-20, max([len(avgTimestamp[i]) for i in range(len(avgTimestamp))]) + 20])
+  #print int(avgTimestamp[0][0])
+  #print int(avgTimestamp[0][len(avgTimestamp[0]) -1])
+  plt.xlim([(int(avgTimestamp[0][0]) - 20), (int(avgTimestamp[0][len(avgTimestamp[0]) -1]) + 20)])
+  #print plt.xlim()
   plt.ylim([-5, upperLimit + 20])
   position = upperLimit / 5
   for i in range(len(interfaceActivity[0])):
     position += upperLimit / 10
     plt.axvline(interfaceActivity[0][i])
-    ax.annotate(interfaceActivity[1][i], xy=(0, 0), xytext=((interfaceActivity[0][i] + 5), position))
+    #print interfaceActivity[0][i]
+    ax.annotate(interfaceActivity[1][i], xy=(interfaceActivity[0][i], 0), xytext=((interfaceActivity[0][i] + 5), position))
 
+  plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
   plt.xlabel('Time (s)')
   plt.ylabel('Throughput (Mbps)')
   plt.title('Throughput On ' + str(file.split("-")[0]) + ' During File Transfer')
@@ -149,5 +157,4 @@ for file in files:
   saveLocation2 = "png/" + file.split("-")[0] + '-' + date + '.png'
   plt.savefig(saveLocation, bbox_inches='tight')
   plt.savefig(saveLocation2, bbox_inches='tight')
-  plt.show()
   plt.close()
