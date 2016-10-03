@@ -12,13 +12,13 @@ end
 
 cd /users/jonganz
 scp /users/jonganz/logs/start.client clientEdge:/users/jonganz/logs/start.edge
-set logFile="/users/jonganz/logs/client-throughput-`date +%m-%d-%y_%H:%M`.csv"
-echo "Experiment started at `date +%m-%d-%y_%T`"
+set logFile="/users/jonganz/logs/client-throughput-`date +%s`.csv"
+echo "Experiment started at `date +%s`"
 bwm-ng -o csv -F $logFile -t 100 &
 set bwm=$!
 sleep 20
 
-/usr/bin/iperf3 -c server -t 600 --logfile /users/jonganz/logs/iperf3-client-log-`date +%m-%d-%y_%H:%M`.log &
+/usr/bin/iperf3 -c server -t 600 --logfile /users/jonganz/logs/iperf3-client-log-`date +%s`.log &
 sleep 110
 
 foreach i ( 1 2 3 )
@@ -27,13 +27,13 @@ foreach i ( 1 2 3 )
   end
   set interface=`cat /users/jonganz/logs/which.interface.Edge`
   scp /users/jonganz/logs/which.interface.Client clientEdge:/users/jonganz/logs/dropConnection.now
-  echo "$interface down at `date +%m-%d-%y_%T`" | tee -a $logFile
+  echo "$interface down at `date +%s`" | tee -a $logFile
   if ( $i == 3 ) then
     sleep 110
   else
     sleep 175
   endif
-  echo "$interface back up at `date +%m-%d-%y_%T`" | tee -a $logFile
+  echo "$interface back up at `date +%s`" | tee -a $logFile
 end
 
 sleep 25
@@ -45,4 +45,4 @@ foreach interfaceFile ( which.interface.Edge which.interface.Client dropConnecti
 end
 
 kill -2 $bwm
-echo "Experiment completed at `date +%m-%d-%y_%T`"
+echo "Experiment completed at `date +%s`"

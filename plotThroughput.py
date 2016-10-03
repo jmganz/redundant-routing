@@ -13,7 +13,8 @@ import matplotlib.patches as mpatches
 
 # Collect the data from the given file
 
-files = sorted(glob.glob('*.csv'))
+#files = sorted(glob.glob('*.csv'))
+files = ['clientEdge-throughput-09-19-16_03:13.csv']
 
 for file in files:
   date = "-".join(file.split("-")[2:]).split(".")[0]
@@ -24,7 +25,7 @@ for file in files:
     ifaces = []
     for line in data:
       if "timestamp" in line or "down" in line or "back" in line:
-        interfaceActivity[0].append(int(dataPoints[len(dataPoints) - 1][0]))
+        interfaceActivity[0].append(int(line[1:].split('at')[1]) - int(dataPoints[0][0]))
         interfaceActivity[1].append(line[1:].split('at')[0])
       else:
         dataPoints.append(line.split(';'))
@@ -108,9 +109,6 @@ for file in files:
         avgTraffic[m].append(sum(sumTraffic[m]) / len(sumTraffic[m]))
         avgPacketsOut[m].append(sum(sumPacketsOut[m]) / len(sumPacketsOut[m]))
         avgPacketsIn[m].append(sum(sumPacketsIn[m]) / len(sumPacketsIn[m]))
-    for intCount in range(len(interfaceActivity[0])):
-      if (int(interfaceActivity[0][intCount]) == int(timestamp[0][i])):
-        interfaceActivity[0][intCount] = i / 10
     skip = j
 
   color = ['b', 'r', 'g', 'm', 'k', 'c', 'y']
@@ -151,4 +149,5 @@ for file in files:
   saveLocation2 = "png/" + file.split("-")[0] + '-' + date + '.png'
   plt.savefig(saveLocation, bbox_inches='tight')
   plt.savefig(saveLocation2, bbox_inches='tight')
+  plt.show()
   plt.close()

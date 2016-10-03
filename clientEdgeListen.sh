@@ -13,8 +13,8 @@ end
 cd /users/jonganz
 while !( -f /users/jonganz/logs/start.edge )
 end
-set logFile="/users/jonganz/logs/clientEdge-throughput-`date +%m-%d-%y_%H:%M`.csv"
-echo "Experiment started at `date +%m-%d-%y_%T`"
+set logFile="/users/jonganz/logs/clientEdge-throughput-`date +%s`.csv"
+echo "Experiment started at `date +%s`"
 bwm-ng -o csv -F $logFile -t 100 &
 set bwm=$!
 sleep 120
@@ -30,7 +30,7 @@ foreach i ( 1 2 3 )
   end
   set interface=`cat /users/jonganz/logs/which.interface.Edge`
   sudo ifconfig $interface down
-  echo "$interface down at `date +%m-%d-%y_%T`" | tee -a $logFile
+  echo "$interface down at `date +%s`" | tee -a $logFile
   if ( $i == 3 ) then
     sleep 110
   else
@@ -44,10 +44,10 @@ foreach i ( 1 2 3 )
   end
 
   sudo ifconfig $interface up
-  echo "$interface back up at `date +%m-%d-%y_%T`" | tee -a $logFile
+  echo "$interface back up at `date +%s`" | tee -a $logFile
   sleep 5
 end
 
 sleep 20
 kill -2 $bwm
-echo "Experiment completed at `date +%m-%d-%y_%T`"
+echo "Experiment completed at `date +%s`"
