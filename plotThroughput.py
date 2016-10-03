@@ -25,7 +25,6 @@ for file in files:
     ifaces = []
     for line in data:
       if "timestamp" in line or "down" in line or "back" in line:
-        #interfaceActivity[0].append(int(line[1:].split('at')[1]) - int(dataPoints[0][0]))
         interfaceActivity[0].append(int(line[1:].split('at')[1]))
         interfaceActivity[1].append(line[1:].split('at')[0])
       else:
@@ -140,26 +139,21 @@ for file in files:
     if upperLimit < goodMax:
       upperLimit = goodMax
   plt.legend(handles=graphTraffic, loc=2)
-  #print int(avgTimestamp[0][0])
-  #print int(avgTimestamp[0][len(avgTimestamp[0]) -1])
   plt.xlim([(int(avgTimestamp[0][0]) - 20), (int(avgTimestamp[0][len(avgTimestamp[0]) -1]) + 20)])
-  #print plt.xlim()
   plt.ylim([-5, upperLimit + 20])
   position = upperLimit / 5
   for i in range(len(interfaceActivity[0])):
     position += upperLimit / 10
     plt.axvline(interfaceActivity[0][i])
-    #print interfaceActivity[0][i]
     ax.annotate(interfaceActivity[1][i], xy=(interfaceActivity[0][i], 0), xytext=((interfaceActivity[0][i] + 5), position))
 
-  plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+  plt.ticklabel_format(style='plain', axis='x', useOffset=True)
   plt.xlabel('Time (s)')
   plt.ylabel('Throughput (Mbps)')
   plt.title('Throughput On ' + str(file.split("-")[0]) + ' During File Transfer')
 
   saveLocation = 'plots/' + file.split("-")[0] + '-' + date + '.pdf'
   saveLocation2 = "png/" + file.split("-")[0] + '-' + date + '.png'
-  #plt.savefig(saveLocation, bbox_inches='tight')
-  #print 'pdf done'
+  plt.savefig(saveLocation, bbox_inches='tight')
   plt.savefig(saveLocation2, bbox_inches='tight')
   plt.close()
