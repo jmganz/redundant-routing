@@ -67,6 +67,20 @@ for file in files:
       index += 1
     while (ifaces[0] != interfaceField[0]):
       ifaces = ifaces[1:] + ifaces[:1]
+  iperfTransfer = []
+  with open (str('iperf3-client-log-' + date + '.log'), "r") as iperf:
+    for line in iperf:
+      if 'sender' in line or 'receiver' in line:
+        avgSpeed = line.split('bits/sec')[0].split(' ')
+        avgSpeed = float(avgSpeed[len(avgSpeed) - 2])
+        break
+      elif 'Bytes' in line:
+        speed = line.split('bits/sec')[0].split(' ')
+        speed = float(speed[len(speed) - 2])
+        if speed > 250:
+          speed = 0
+        iperfTransfer.append(speed)
+    
 
   avgTimestamp = [[] for _ in xrange(len(ifaces))]
   avgMbitOut = [[] for _ in xrange(len(ifaces))]
@@ -117,12 +131,16 @@ for file in files:
   upperLimit = -20
   pixelSize = 20
   transparency = 0.9
+  graphTraffic.append(mlines.Line2D(range(int(avgTimestamp[0][0]), int(avgTimestamp[0][0]) + len(iperfTransfer)), iperfTransfer, color='k', label='instantaneous throughput'))
+  ax.add_line(mlines.Line2D(range(int(avgTimestamp[0][0]) + 20, int(avgTimestamp[0][0]) + len(iperfTransfer) + 20), iperfTransfer, color='k', label='instantaneous throughput'))
+  graphTraffic.append(plt.axhline(y=avgSpeed, color='b', ls='dashed', label='average throughput'))
   for index in range(len(ifaces)):
     if ('total' == ifaces[index]) or ('lo' == ifaces[index]):
       continue
     #graphTraffic.append(mlines.Line2D(avgTimestamp[index], avgMbitOut[index], color=color[index], label=ifaces[index]))
     #ax.add_line(mlines.Line2D(avgTimestamp[index], avgMbitOut[index], color=color[index], label=ifaces[index]))
     #graphTraffic.append(ax.scatter(avgTimestamp[index], avgMbitOut[index], s=20, color=color[index], alpha=0.8, lw=0, label=ifaces[index]))
+
     graphTraffic.append(ax.scatter(timestamp[index], MbitOut[index], s=pixelSize, color=color[index], alpha=transparency, lw=0, label=ifaces[index]))
     pixelSize -= 4
     transparency -= 0.15
