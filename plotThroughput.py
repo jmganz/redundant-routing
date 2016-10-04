@@ -16,7 +16,6 @@ import matplotlib.patches as mpatches
 files = sorted(glob.glob('*.csv'))
 
 for file in files:
-  #print file
   date = "-".join(file.split("-")[2:]).split(".")[0]
   with open (file, "r") as data:
     dataPoints = []
@@ -47,8 +46,7 @@ for file in files:
       adjustedIndex = index + drift
       whichInterface = adjustedIndex % len(ifaces)
       while (dataPoints[adjustedIndex][1] != ifaces[whichInterface]):
-        #print 'add ' + str(dataPoints[index][0])
-        timestamp[whichInterface].append(dataPoints[index][0])
+        timestamp[whichInterface].append(dataPoints[adjustedIndex][0])
         MbitOut[whichInterface].append(0)
         MbitIn[whichInterface].append(0)
         traffic[whichInterface].append(0)
@@ -56,7 +54,7 @@ for file in files:
         packetsIn[whichInterface].append(0)
         errorsIn[whichInterface].append(0)
         errorsOut[whichInterface].append(0)
-        drift = drift + 1
+        drift += 1
         whichInterface = (index + drift) % len(ifaces)
       timestamp[whichInterface].append(dataPoints[adjustedIndex][0])
       MbitOut[whichInterface].append(float(dataPoints[adjustedIndex][2]) * 8.0 / 1000000.0)
@@ -66,8 +64,7 @@ for file in files:
       packetsIn[whichInterface].append(float(dataPoints[adjustedIndex][8]))
       errorsIn[whichInterface].append(int(dataPoints[adjustedIndex][14]))
       errorsOut[whichInterface].append(int(dataPoints[adjustedIndex][15]))
-      index = index + 1
-
+      index += 1
     while (ifaces[0] != interfaceField[0]):
       ifaces = ifaces[1:] + ifaces[:1]
 
@@ -139,13 +136,19 @@ for file in files:
     if upperLimit < goodMax:
       upperLimit = goodMax
   plt.legend(handles=graphTraffic, loc=2)
-  plt.xlim([(int(avgTimestamp[0][0]) - 20), (int(avgTimestamp[0][len(avgTimestamp[0]) -1]) + 20)])
-  plt.ylim([-5, upperLimit + 20])
+  plt.xlim([(int(timestamp[1][0]) - 20), (int(timestamp[1][len(timestamp[1]) - 1]) + 20)])
+  #plt.ylim([-5, upperLimit + 20])
+  plt.ylim([-10, 220])
   position = upperLimit / 5
   for i in range(len(interfaceActivity[0])):
+    # plot vertical lines indicating interface activity
     position += upperLimit / 10
     plt.axvline(interfaceActivity[0][i])
-    ax.annotate(interfaceActivity[1][i], xy=(interfaceActivity[0][i], 0), xytext=((interfaceActivity[0][i] + 5), position))
+    if (i > 0) and (interfaceActivity[0][i] - interfaceActivity[0][i - 1] > 100):
+      shift = -61
+    else:
+      shift = 2
+    ax.annotate(interfaceActivity[1][i], xy=(interfaceActivity[0][i], 0), xytext=((interfaceActivity[0][i] + shift), position))
 
   plt.ticklabel_format(style='plain', axis='x', useOffset=True)
   plt.xlabel('Time (s)')
