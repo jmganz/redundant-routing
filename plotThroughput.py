@@ -6,6 +6,7 @@ import sys
 import glob
 import math
 import numpy
+import random
 from array import array
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
@@ -125,6 +126,19 @@ for file in files:
 
   color = ['r', 'g', 'b', 'm', 'c', 'k', 'y']
 
+  # This code looks odd
+  # We'll shuffle the ifaces until they're sorted
+  # There are usually less than 10
+  # so statistically, it shouldn't take too many attempts
+  # even though the shuffle is random
+  # but if the shuffle is random, we mix up all the associated data!
+  # that's why we use variable r: it forces the exact same shuffle
+  # for all lists, keeping the association for all ifaces
+  while (ifaces != sorted(ifaces)):
+    r = random.random()
+    for variable in [ifaces, timestamp, MbitOut, traffic, packetsOut, packetsIn, errorsIn, errorsOut, avgTimestamp, avgMbitOut, avgMbitIn, avgTraffic, avgPacketsOut, avgPacketsIn, sumMbitOut, sumMbitIn, sumTraffic, sumPacketsOut, sumPacketsIn]:
+      random.shuffle(variable, lambda: r)
+
   plt.figure(num=None, figsize=(16, 12), dpi=90, facecolor='w', edgecolor='k')
   ax = plt.subplot(111)
   graphTraffic = []
@@ -153,10 +167,18 @@ for file in files:
         break
     if upperLimit < goodMax:
       upperLimit = goodMax
-  plt.legend(handles=graphTraffic, loc=2)
+  moveLegend = 0 # useful for my first set of data
+  if (moveLegend):
+    legend = plt.legend(handles=graphTraffic, loc='lower right')
+    plt.draw()
+    legendBox = legend.legendPatch.get_bbox().inverse_transformed(ax.transAxes)
+    legendBox.set_points([[legendBox.x0 + 1.15, legendBox.y0 + 0.20], [legendBox.x1 + 1.15, legendBox.y1 + 0.20]])
+    legend.set_bbox_to_anchor(legendBox)
+  else:
+    legend = plt.legend(handles=graphTraffic, loc='upper left')
   plt.xlim([(int(timestamp[1][0]) - 20), (int(timestamp[1][len(timestamp[1]) - 1]) + 20)])
   #plt.ylim([-5, upperLimit + 20])
-  plt.ylim([-10, 220])
+  plt.ylim([-10, 250])
   position = upperLimit / 5
   for i in range(len(interfaceActivity[0])):
     # plot vertical lines indicating interface activity
