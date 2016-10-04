@@ -12,13 +12,14 @@ end
 
 cd /users/jonganz
 scp /users/jonganz/logs/start.client clientEdge:/users/jonganz/logs/start.edge
-set logFile="/users/jonganz/logs/client-throughput-`date +%s`.csv"
+set rightNow=`date +%s`
+set logFile="/users/jonganz/logs/client-throughput-$rightNow.csv"
 echo "Experiment started at `date +%s`"
 bwm-ng -o csv -F $logFile -t 100 &
 set bwm=$!
 sleep 20
 
-/usr/bin/iperf3 -c server -t 600 --logfile /users/jonganz/logs/iperf3-client-log-`date +%s`.log &
+/usr/bin/iperf3 -c server -f m -t 600 --logfile /users/jonganz/logs/iperf3-client-log-$rightNow.log &
 sleep 110
 
 foreach i ( 1 2 3 )
