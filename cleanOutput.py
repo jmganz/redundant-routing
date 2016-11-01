@@ -9,35 +9,36 @@ from os import remove, close
 
 # Collect the data from the given file
 
-files = sorted(glob.glob('*.csv'))
+files = sorted(glob.glob('15 - Identical QoS Redo/*.csv'))
 
 for file in files:
+  print file
   newFile = mkstemp()
   with open ('newFile', 'w') as cleanData:
     with open (file, 'r') as oldData:
       for line in oldData:
         newLine = []
         lastLine = line
-        for match in ['down', 'back']:
-          if match in line and not (line.startswith('eth') or line.startswith('#eth')):
+        for match in ['down', 'back', ' start']:
+          if match in line and not (line.startswith('eth') or line.startswith('#eth') or line.startswith('iperf') or line.startswith('#iperf')):
             splitLine = line.split(match)
             newLine.append(splitLine[0][:-5])
             newLine.append('#' + splitLine[0][-5:] + match + splitLine[1])
             nextLine = oldData.next()
-            while ((nextLine.startswith('eth') or nextLine.startswith('#eth')) and ('down' in nextLine or 'back' in nextLine)):
-              if nextLine.startswith('eth'):
+            while ((nextLine.startswith('eth') or nextLine.startswith('#eth') or line.startswith('iperf') or line.startswith('#iperf')) and ('down' in nextLine or 'back' in nextLine or 'iperf' in nextLine)):
+              if nextLine.startswith('eth') or nextLine.startswith('iperf'):
                 nextLine = '#' + nextLine
               newLine.append(nextLine)
               nextLine = oldData.next()
-            if (nextLine.count(';') != 15) or not (1460000000 < int(nextLine.split(';')[0]) < 1480000000):
+            if (nextLine.count(';') != 15) or nextLine.split(';')[0] == '' or not (1460000000 < int(nextLine.split(';')[0]) < 1480000000):
               newLine[0] = newLine[0] + nextLine
             else:
               print 'ERROR: ' + nextLine
-        if (line.count(';') == 15) and (1460000000 < int(line.split(';')[0]) < 1480000000) and not ('timestamp' in line or 'down' in line or 'back' in line):
+        if (line.count(';') == 15) and (1460000000 < int(line.split(';')[0]) < 1480000000) and not ('timestamp' in line or 'down' in line or 'back' in line or 'iperf' in line):
           newLine.append(line)
         elif (line.startswith('total') or line.startswith('lo')):
           print 'ERROR: ' + line
-        elif line.startswith('eth'):
+        elif line.startswith('eth') or line.startswith('iperf'):
           newLine.append('#' + line)
         elif line.startswith('#'):
           newLine.append(line)

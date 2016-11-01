@@ -11,6 +11,7 @@ foreach interfaceFile ( which.interface.Edge which.interface.Client dropConnecti
 end
 
 cd /users/jonganz
+touch /users/jonganz/logs/start.client
 scp /users/jonganz/logs/start.client clientEdge:/users/jonganz/logs/start.edge
 set rightNow=`date +%s`
 set logFile="/users/jonganz/logs/client-throughput-$rightNow.csv"
@@ -20,6 +21,7 @@ set bwm=$!
 sleep 20
 
 /usr/bin/iperf3 -c server -f m -t 600 --logfile /users/jonganz/logs/iperf3-client-log-$rightNow.log &
+echo "iperf started at `date +%s`" | tee -a $logFile
 sleep 110
 
 foreach i ( 1 2 3 )
@@ -39,11 +41,12 @@ end
 
 sleep 25
 
-foreach interfaceFile ( which.interface.Edge which.interface.Client dropConnection.now )
+foreach interfaceFile ( which.interface.Edge which.interface.Client dropConnection.now start.edge )
   if ( -f /users/jonganz/logs/$interfaceFile ) then
     rm /users/jonganz/logs/$interfaceFile
   endif
 end
 
 kill -2 $bwm
-echo "Experiment completed at `date +%s`"
+echo "Experiment completed at `date +%l:%M`"
+tail -5 /users/jonganz/logs/iperf3-client-log-$rightNow.log

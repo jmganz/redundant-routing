@@ -22,8 +22,9 @@ sleep 120
 foreach i ( 1 2 3 )
   set activeInterfaceLine=`cat $logFile | tail -300 | sed '/total/d' | sed '/lo/d' | sort -n -t';' -k 3 | tail -1`
   set activeInterface=`echo $activeInterfaceLine | awk -F';' '{print $2}'`
-  set activeSpeed=`echo $activeInterfaceLine | awk -F';' '{print $3}'`
-  echo "found $activeInterface with speed $activeSpeed bytes/sec"
+  set activeSpeed=`echo $activeInterfaceLine | awk -F';' '{print $3}' | awk '{print substr($0,1,index($0,".")-1)}'`
+  @ activeSpeed= ( $activeSpeed * 8 / 1000000 )
+  echo "found $activeInterface with speed $activeSpeed Mbps"
   echo $activeInterface > /users/jonganz/logs/which.interface.Edge
   scp /users/jonganz/logs/which.interface.Edge client:/users/jonganz/logs/which.interface.Client
   while !( -f /users/jonganz/logs/dropConnection.now )
@@ -50,4 +51,4 @@ end
 
 sleep 20
 kill -2 $bwm
-echo "Experiment completed at `date +%s`"
+echo "Experiment completed at `date +%l:%M`"
