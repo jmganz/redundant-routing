@@ -9,7 +9,7 @@ from os import remove, close
 
 # Collect the data from the given file
 
-files = sorted(glob.glob('15 - Identical QoS Redo/*.csv'))
+files = sorted(glob.glob('*/*.csv'))
 
 for file in files:
   print file
